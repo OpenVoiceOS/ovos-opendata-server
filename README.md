@@ -14,13 +14,13 @@ A **FastAPI service** for collecting anonymized OVOS usage metrics and data with
 
 ## **🛠️ Setup & Installation**  
 
-### **1️⃣ Clone the Repository**  
+### ** Clone the Repository**  
 ```bash
 git clone https://github.com/TigreGotico/metrics-server-docker
 cd metrics-server-docker
 ```
 
-### **3️⃣ Start the Services**  
+### ** Start the Services**  
 ```bash
 docker-compose up --build -d
 ```
