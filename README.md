@@ -1,6 +1,6 @@
-## **OVOS Metrics Collector 📊**  
+## **OVOS OpenData Collector 📊**  
 
-A **FastAPI service** for collecting anonymized OVOS usage metrics with an **interactive Streamlit dashboard** for visualization.  
+A **FastAPI service** for collecting anonymized OVOS usage metrics and data with an **interactive Streamlit dashboard** for visualization.  
 
 🚀 **Features:**  
 - ✅ **FastAPI backend** to store utterance logs  
@@ -34,19 +34,42 @@ This will start:
 ## **📝 API Usage**  
 
 ![img_1.png](img_1.png)
-### **1️⃣ Submit Data (POST)**  
+
+### **Submit Data (POST)**  
+
 Send anonymized metrics from OVOS:  
 ```bash
-curl -X POST "http://localhost:8000/metrics" \
-     -H "Content-Type: application/json" \
-     -H "User-Agent: ovos-core-metrics" \
-     -d '{
-           "utterance": "What’s the weather?",
-           "intent": "ask_weather",
-           "language": "en"
-         }'
+curl -X POST "http://localhost:8000/intents" \
+     -H "User-Agent: ovos-metrics" \
+     -F "utterance=What’s the weather?" \
+     -F "lang=en" \
+     -F "intent=weather" \
+     -F "match_data={\"pipeline\": \"padatious_high\"}"
 ```
->NOTE: the user agent **must** be `ovos-core-metrics` otherwise the request is ignored
+
+```bash
+curl -X POST "http://localhost:8000/wake_word" \
+     -H "User-Agent: ovos-metrics" \
+     -F "name=alexa" \
+     -F "model=default" \
+     -F "plugin=mycroft-precise" \
+     -F "plugin_config={\"sensitivity\": 0.5}" \
+     -F "audio=@wakeword.wav"
+```
+
+```bash
+curl -X POST "http://localhost:8000/stt" \
+     -H "User-Agent: ovos-metrics" \
+     -F "transcript=What’s the weather?" \
+     -F "model=whisper" \
+     -F "plugin=ovos-stt-plugin-whisper" \
+     -F "plugin_config={\"language\": \"en\"}" \
+     -F "audio=@utterance.wav"
+
+```
+
+>NOTE: the user agent **must** be `ovos-metrics` otherwise the request is ignored
+
 
 ---
 
@@ -60,9 +83,9 @@ curl -X POST "http://localhost:8000/metrics" \
    - 📥 **Export** data to **CSV & JSON**  
    - 🔄 **Live updates & refresh button**  
 
-![img_3.png](img_3.png)
-![img_2.png](img_2.png)
-![img.png](img.png)
+
+![img_1.png](output.gif)
+
 ---
 
 
