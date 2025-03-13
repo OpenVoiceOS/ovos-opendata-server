@@ -96,5 +96,8 @@ curl -X POST "http://localhost:8000/stt" \
 
 ---
 
-## **📝 License**  
-MIT License - Feel free to use and modify.  
+## **Credits**
+
+<img src="img.png" width="128"/>
+
+> This project was funded by the Ministerio para la Transformación Digital y de la Función Pública and Plan de Recuperación, Transformación y Resiliencia - Funded by EU – NextGenerationEU within the framework of the project ILENIA with reference 2022/TL22/00215337
