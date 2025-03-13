@@ -1,35 +1,39 @@
-
+name: ovos-opendata
 services:
-  api:
+  ovos-opendata-api:
     build: .
+    container_name: ovos-opendata-api
+    image: ovos-opendata/api
+    restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8007:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/ovos_metrics
+      - DATABASE_URL=postgresql://postgres:password@ovos-opendata-db:5432/ovos_metrics
     depends_on:
-      - db
+      - ovos-opendata-db
 
-  db:
+  ovos-opendata-db:
     image: postgres:latest
-    restart: always
+    container_name: ovos-opendata-db
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: ovos_metrics
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - ~/.local/share/ovos-opendata:/var/lib/postgresql/data
 
-  dashboard:
+  ovos-opendata-dashboard:
     build:
       context: .
       dockerfile: Dockerfile.dashboard
+    container_name: ovos-opendata-dashboard
+    image: ovos-opendata/dashboard
+    restart: unless-stopped
     ports:
-      - "8501:8501"
+      - "8502:8501"
     depends_on:
-      - api
-      - db
+      - ovos-opendata-api
+      - ovos-opendata-db
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/ovos_metrics
-
-volumes:
-  pg_data:
+      - DATABASE_URL=postgresql://postgres:password@ovos-opendata-db:5432/ovos_metrics

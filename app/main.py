@@ -65,6 +65,10 @@ Base.metadata.create_all(bind=engine)
 EXPECTED_USER_AGENT = "ovos-metrics"
 
 
+@app.get("/status")
+async def status(request: Request):
+    return {"status": "success"}
+
 @app.post("/intents")
 async def upload_intent(
         request: Request,
