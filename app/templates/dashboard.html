@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OVOS Open Data Dashboard</title>
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>OVOS Open Data Dashboard</h1>
+  </header>
+
+  <section class="summary-cards">
+    <div class="card" id="card-intents">
+      <div class="card-label">Total Intents</div>
+      <div class="card-value" id="stat-intents">—</div>
+    </div>
+    <div class="card" id="card-wakewords">
+      <div class="card-label">Total Wake Words</div>
+      <div class="card-value" id="stat-wakewords">—</div>
+    </div>
+    <div class="card" id="card-utterances">
+      <div class="card-label">Total Utterances</div>
+      <div class="card-value" id="stat-utterances">—</div>
+    </div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="intents">Intents</button>
+    <button class="tab-btn" data-tab="wakewords">Wake Words</button>
+    <button class="tab-btn" data-tab="utterances">Utterances</button>
+  </nav>
+
+  <!-- Intents Tab -->
+  <section class="tab-panel active" id="tab-intents">
+    <div class="charts-row">
+      <div class="chart-box"><canvas id="chart-lang"></canvas></div>
+      <div class="chart-box"><canvas id="chart-intent"></canvas></div>
+    </div>
+    <div class="filters">
+      <label>Language: <input type="text" id="filter-intent-lang" placeholder="e.g. en-us"></label>
+      <label>Intent: <input type="text" id="filter-intent-name" placeholder="intent name"></label>
+      <label>From: <input type="date" id="filter-intent-from"></label>
+      <label>To: <input type="date" id="filter-intent-to"></label>
+      <button onclick="loadIntents(1)">Apply</button>
+      <a id="export-intents-csv" href="/intents/export?format=csv">Export CSV</a>
+      <a id="export-intents-json" href="/intents/export?format=json">Export JSON</a>
+    </div>
+    <table id="table-intents">
+      <thead><tr><th>ID</th><th>Intent</th><th>Language</th><th>Utterance</th><th>Created</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="pagination" id="page-intents"></div>
+  </section>
+
+  <!-- Wake Words Tab -->
+  <section class="tab-panel" id="tab-wakewords">
+    <div class="charts-row">
+      <div class="chart-box"><canvas id="chart-ww"></canvas></div>
+    </div>
+    <div class="filters">
+      <label>Name: <input type="text" id="filter-ww-name" placeholder="hey mycroft"></label>
+      <label>Plugin: <input type="text" id="filter-ww-plugin" placeholder="plugin name"></label>
+      <button onclick="loadWakeWords(1)">Apply</button>
+      <a id="export-ww-csv" href="/wake_words/export?format=csv">Export CSV</a>
+      <a id="export-ww-json" href="/wake_words/export?format=json">Export JSON</a>
+    </div>
+    <table id="table-ww">
+      <thead><tr><th>ID</th><th>Wake Word</th><th>Model</th><th>Plugin</th><th>Language</th><th>Created</th><th>Audio</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="pagination" id="page-ww"></div>
+  </section>
+
+  <!-- Utterances Tab -->
+  <section class="tab-panel" id="tab-utterances">
+    <div class="filters">
+      <label>Language: <input type="text" id="filter-utt-lang" placeholder="e.g. en-us"></label>
+      <label>Model: <input type="text" id="filter-utt-model" placeholder="model name"></label>
+      <label>Plugin: <input type="text" id="filter-utt-plugin" placeholder="plugin name"></label>
+      <button onclick="loadUtterances(1)">Apply</button>
+      <a id="export-utt-csv" href="/utterances/export?format=csv">Export CSV</a>
+      <a id="export-utt-json" href="/utterances/export?format=json">Export JSON</a>
+    </div>
+    <table id="table-utt">
+      <thead><tr><th>ID</th><th>Model</th><th>Plugin</th><th>Language</th><th>Created</th><th>Audio</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="pagination" id="page-utt"></div>
+  </section>
+
+  <!-- Audio player modal -->
+  <div id="audio-modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+      <h3>Audio Playback</h3>
+      <audio id="audio-player" controls></audio>
+    </div>
+  </div>
+
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
