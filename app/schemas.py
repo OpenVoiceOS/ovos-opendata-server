@@ -19,6 +19,8 @@ class IntentRecord(BaseModel):
     intent: str
     language: str
     utterance: str
+    pipeline: Optional[str] = None
+    core_version: Optional[str] = None
     created_at: Optional[datetime] = None
 
 

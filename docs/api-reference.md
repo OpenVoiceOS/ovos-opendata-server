@@ -6,7 +6,7 @@ All intake endpoints require `User-Agent: ovos-metrics` or return `404`.
 
 | Method | Path | Form Fields | Notes |
 |--------|------|------------|-------|
-| POST | `/intents` | `utterance`, `intent`, `lang`, `match_data?` | Language normalized to lowercase |
+| POST | `/intents` | `utterance`, `intent`, `lang`, `match_data?`, `pipeline?`, `core_version?` | Language normalized to lowercase; `pipeline` is a pipe-joined stage list (e.g. `adapt_high\|padatious_high`); `core_version` is the reporting device's ovos-core version |
 | POST | `/wake_word` | `name`, `audio` (file), `model?`, `lang?`, `plugin?`, `plugin_config?` | Audio limited by `MAX_AUDIO_SIZE_MB` (default 10) |
 | POST | `/stt` | `transcript`, `lang`, `audio` (file), `model?`, `plugin?`, `plugin_config?` | Audio limited by `MAX_AUDIO_SIZE_MB` |
 

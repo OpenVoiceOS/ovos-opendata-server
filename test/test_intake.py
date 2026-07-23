@@ -47,6 +47,44 @@ def test_intent_language_lowercased(client: TestClient) -> None:
     assert any(i["language"] == "en-us" for i in items)
 
 
+def test_intent_pipeline_and_core_version_stored(client: TestClient) -> None:
+    """POST /intents with pipeline and core_version stores and exposes them."""
+    resp = client.post(
+        "/intents",
+        data={
+            "utterance": "turn on the lights",
+            "intent": "LightsSkill.on",
+            "lang": "en-us",
+            "pipeline": "adapt_high|padatious_high",
+            "core_version": "0.1.0",
+        },
+        headers=OVOS_HEADERS,
+    )
+    assert resp.status_code == 200
+    q = client.get("/intents?intent=LightsSkill.on")
+    assert q.status_code == 200
+    items = q.json()["items"]
+    match = next(i for i in items if i["intent"] == "LightsSkill.on")
+    assert match["pipeline"] == "adapt_high|padatious_high"
+    assert match["core_version"] == "0.1.0"
+
+
+def test_intent_pipeline_and_core_version_optional(client: TestClient) -> None:
+    """POST /intents without pipeline/core_version still succeeds with null fields."""
+    resp = client.post(
+        "/intents",
+        data={"utterance": "hello", "intent": "HelloSkill", "lang": "en-us"},
+        headers=OVOS_HEADERS,
+    )
+    assert resp.status_code == 200
+    q = client.get("/intents?intent=HelloSkill")
+    assert q.status_code == 200
+    items = q.json()["items"]
+    match = next(i for i in items if i["intent"] == "HelloSkill")
+    assert match["pipeline"] is None
+    assert match["core_version"] is None
+
+
 def test_wake_word_correct_ua(client: TestClient) -> None:
     """POST /wake_word with correct User-Agent returns 200."""
     audio = io.BytesIO(b"\x00" * 100)
