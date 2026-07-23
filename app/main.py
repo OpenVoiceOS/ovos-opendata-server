@@ -9,14 +9,14 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.database import Base, engine
+from app.database import Base, get_engine
 from app.routers import audio, dashboard, data_intake, export, query
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Create database tables on startup."""
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=get_engine())
     yield
 
 

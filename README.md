@@ -18,8 +18,10 @@ All configuration via environment variables (`.env.example` provided):
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `DATABASE_URL` | Yes | — | PostgreSQL DSN (raises RuntimeError if unset) |
+| `DATABASE_URL` | No | `sqlite:///./ovos_opendata.db` | Database DSN. Defaults to a local SQLite file for easy local/dev use — **production deployments should set this to a PostgreSQL DSN**. |
 | `MAX_AUDIO_SIZE_MB` | No | `10` | Audio upload size cap in MB |
+
+Settings are loaded via `app/config.py` (pydantic-settings), which also reads a `.env` file if present. The app is importable and runnable without any environment variables set.
 
 ## API Overview
 

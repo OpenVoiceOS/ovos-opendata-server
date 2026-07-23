@@ -2,11 +2,10 @@
 # Licensed under the Apache License, Version 2.0
 """Data intake POST endpoints for OVOS device metrics collection."""
 
-import os
-
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database import get_db
 from app.models import Intent, Utterance, WakeWord
 
@@ -35,7 +34,7 @@ async def read_audio_with_limit(audio: UploadFile) -> bytes:
     Raises:
         HTTPException: 413 if the file exceeds the configured size limit.
     """
-    max_bytes = int(os.getenv("MAX_AUDIO_SIZE_MB", "10")) * 1024 * 1024
+    max_bytes = get_settings().max_audio_size_mb * 1024 * 1024
     data = await audio.read(max_bytes + 1)
     if len(data) > max_bytes:
         raise HTTPException(status_code=413, detail="Audio file too large")

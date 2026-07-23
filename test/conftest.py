@@ -13,9 +13,13 @@ from fastapi.testclient import TestClient  # noqa: E402
 from sqlalchemy import create_engine  # noqa: E402
 from sqlalchemy.orm import sessionmaker  # noqa: E402
 
+from app.config import get_settings  # noqa: E402
 from app.database import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import Intent, Utterance, WakeWord  # noqa: E402
+
+# Settings are lru_cache'd; ensure they reflect the env vars set above.
+get_settings.cache_clear()
 
 _SQLITE_URL = "sqlite:///./test_ovos.db"
 _engine = create_engine(_SQLITE_URL, connect_args={"check_same_thread": False})

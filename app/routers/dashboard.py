@@ -11,6 +11,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database import get_db
 from app.models import Intent, Utterance, WakeWord
 from app.schemas import DashboardStats
@@ -21,7 +22,6 @@ _templates: Optional[Jinja2Templates] = None
 
 # Module-level stats cache: (stats_dict, expire_timestamp)
 _stats_cache: Tuple[Optional[Dict[str, Any]], float] = (None, 0.0)
-_CACHE_TTL = 60.0  # seconds
 
 
 def _get_templates() -> Jinja2Templates:
@@ -86,7 +86,7 @@ def get_dashboard_stats(db: Session = Depends(get_db)) -> DashboardStats:
     cached, expires = _stats_cache
     if cached is None or time.monotonic() > expires:
         cached = _compute_stats(db)
-        _stats_cache = (cached, time.monotonic() + _CACHE_TTL)
+        _stats_cache = (cached, time.monotonic() + get_settings().dashboard_cache_ttl)
     return DashboardStats(**cached)
 
 
