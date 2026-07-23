@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database import get_db
 from app.models import Intent, Utterance, WakeWord
+from app.security import limiter, require_api_key, validate_wav
 
 router = APIRouter()
 
@@ -42,6 +43,7 @@ async def read_audio_with_limit(audio: UploadFile) -> bytes:
 
 
 @router.post("/intents")
+@limiter.limit(lambda: get_settings().rate_limit)
 async def upload_intent(
     request: Request,
     utterance: str = Form(...),
@@ -50,17 +52,19 @@ async def upload_intent(
     match_data: str = Form(None),
     db: Session = Depends(get_db),
     _: None = Depends(require_ovos_agent),
+    __: None = Depends(require_api_key),
 ) -> dict:
     """Record an intent match event from an OVOS device.
 
     Args:
-        request: FastAPI request (used by require_ovos_agent dependency).
+        request: FastAPI request (used by require_ovos_agent dependency and rate limiting).
         utterance: The user utterance text.
         intent: The matched intent name.
         lang: BCP-47 language tag (will be normalized to lowercase).
         match_data: Optional JSON string of intent match details.
         db: Database session.
         _: require_ovos_agent dependency result (unused).
+        __: require_api_key dependency result (unused).
 
     Returns:
         dict with status 'success'.
@@ -77,6 +81,7 @@ async def upload_intent(
 
 
 @router.post("/wake_word")
+@limiter.limit(lambda: get_settings().rate_limit)
 async def upload_wake_word(
     request: Request,
     name: str = Form(...),
@@ -87,6 +92,7 @@ async def upload_wake_word(
     plugin_config: str = Form(None),
     db: Session = Depends(get_db),
     _: None = Depends(require_ovos_agent),
+    __: None = Depends(require_api_key),
 ) -> dict:
     """Record a wake-word detection sample from an OVOS device.
 
@@ -100,11 +106,13 @@ async def upload_wake_word(
         plugin_config: Optional JSON plugin configuration.
         db: Database session.
         _: require_ovos_agent dependency result (unused).
+        __: require_api_key dependency result (unused).
 
     Returns:
         dict with status 'success'.
     """
     audio_bytes = await read_audio_with_limit(audio)
+    validate_wav(audio_bytes)
     record = WakeWord(
         name=name,
         language=lang,
@@ -119,6 +127,7 @@ async def upload_wake_word(
 
 
 @router.post("/stt")
+@limiter.limit(lambda: get_settings().rate_limit)
 async def upload_stt_utterance(
     request: Request,
     transcript: str = Form(...),
@@ -129,6 +138,7 @@ async def upload_stt_utterance(
     plugin_config: str = Form(None),
     db: Session = Depends(get_db),
     _: None = Depends(require_ovos_agent),
+    __: None = Depends(require_api_key),
 ) -> dict:
     """Record an STT utterance sample from an OVOS device.
 
@@ -142,11 +152,13 @@ async def upload_stt_utterance(
         plugin_config: Optional JSON plugin configuration.
         db: Database session.
         _: require_ovos_agent dependency result (unused).
+        __: require_api_key dependency result (unused).
 
     Returns:
         dict with status 'success'.
     """
     audio_bytes = await read_audio_with_limit(audio)
+    validate_wav(audio_bytes)
     record = Utterance(
         transcript=transcript,
         language=lang,

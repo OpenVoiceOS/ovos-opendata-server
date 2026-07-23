@@ -2,15 +2,22 @@
 
 ## Intake Endpoints
 
-All intake endpoints require `User-Agent: ovos-metrics` or return `404`.
+All intake endpoints require `User-Agent: ovos-metrics` or return `404`. If the
+server has `API_KEY` configured, requests must also send a matching
+`X-API-Key` header. Both `/wake_word` and `/stt` validate that the uploaded
+audio is a real WAV file before storing it. All three endpoints are rate
+limited per client IP (`RATE_LIMIT`, default `60/minute`).
 
 | Method | Path | Form Fields | Notes |
 |--------|------|------------|-------|
 | POST | `/intents` | `utterance`, `intent`, `lang`, `match_data?` | Language normalized to lowercase |
-| POST | `/wake_word` | `name`, `audio` (file), `model?`, `lang?`, `plugin?`, `plugin_config?` | Audio limited by `MAX_AUDIO_SIZE_MB` (default 10) |
-| POST | `/stt` | `transcript`, `lang`, `audio` (file), `model?`, `plugin?`, `plugin_config?` | Audio limited by `MAX_AUDIO_SIZE_MB` |
+| POST | `/wake_word` | `name`, `audio` (file), `model?`, `lang?`, `plugin?`, `plugin_config?` | Audio limited by `MAX_AUDIO_SIZE_MB` (default 10); must be a valid WAV file |
+| POST | `/stt` | `transcript`, `lang`, `audio` (file), `model?`, `plugin?`, `plugin_config?` | Audio limited by `MAX_AUDIO_SIZE_MB`; must be a valid WAV file |
 
-**Errors**: `413` if audio exceeds limit; `404` for wrong User-Agent.
+**Errors**: `400` if the uploaded audio is not a valid WAV file; `401` if
+`API_KEY` is configured and the request's `X-API-Key` header is missing or
+wrong; `404` for wrong User-Agent; `413` if audio exceeds the size limit;
+`429` if the caller exceeds `RATE_LIMIT`.
 
 ---
 

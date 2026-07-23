@@ -18,7 +18,7 @@ def _seed(client: TestClient) -> None:
         data={"utterance": "lights on", "intent": "SmartHomeSkill", "lang": "en-us"},
         headers=OVOS_HEADERS,
     )
-    audio = io.BytesIO(b"\x00" * 20)
+    audio = io.BytesIO(b"RIFF\x00\x00\x00\x00WAVE")
     client.post(
         "/wake_word",
         data={"name": "hey mycroft", "lang": "en-us", "model": "m", "plugin": "p"},

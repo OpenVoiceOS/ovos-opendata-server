@@ -60,7 +60,7 @@ def test_intents_filter_date(client: TestClient) -> None:
 
 def test_wake_words_list(client: TestClient) -> None:
     """GET /wake_words returns valid paginated response."""
-    audio = io.BytesIO(b"\x00" * 10)
+    audio = io.BytesIO(b"RIFF\x00\x00\x00\x00WAVE")
     client.post(
         "/wake_word",
         data={"name": "hey test", "lang": "en-us", "model": "m", "plugin": "p"},
@@ -76,7 +76,7 @@ def test_wake_words_list(client: TestClient) -> None:
 
 def test_wake_words_filter_name(client: TestClient) -> None:
     """name filter on /wake_words narrows results."""
-    audio = io.BytesIO(b"\x00" * 10)
+    audio = io.BytesIO(b"RIFF\x00\x00\x00\x00WAVE")
     client.post(
         "/wake_word",
         data={"name": "unique-ww", "lang": "en-us", "model": "m", "plugin": "p"},
@@ -91,7 +91,7 @@ def test_wake_words_filter_name(client: TestClient) -> None:
 
 def test_utterances_list(client: TestClient) -> None:
     """GET /utterances returns valid paginated response."""
-    audio = io.BytesIO(b"\x00" * 10)
+    audio = io.BytesIO(b"RIFF\x00\x00\x00\x00WAVE")
     client.post(
         "/stt",
         data={"transcript": "hi there", "lang": "en-us", "model": "m", "plugin": "p"},
@@ -106,7 +106,7 @@ def test_utterances_list(client: TestClient) -> None:
 
 def test_utterances_filter_lang(client: TestClient) -> None:
     """lang filter on /utterances returns only matching records."""
-    audio = io.BytesIO(b"\x00" * 10)
+    audio = io.BytesIO(b"RIFF\x00\x00\x00\x00WAVE")
     client.post(
         "/stt",
         data={"transcript": "bonjour", "lang": "fr-fr", "model": "m", "plugin": "p"},

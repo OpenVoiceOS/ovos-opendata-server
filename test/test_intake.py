@@ -11,6 +11,22 @@ OVOS_HEADERS = {"User-Agent": "ovos-metrics"}
 BAD_HEADERS = {"User-Agent": "curl/7.0"}
 
 
+def make_wav_bytes(data_size: int = 100) -> bytes:
+    """Build a minimal, valid WAV file's bytes (RIFF/WAVE header + fmt/data chunks)."""
+    data = b"\x00" * data_size
+    fmt_chunk = b"fmt " + (16).to_bytes(4, "little") + (
+        (1).to_bytes(2, "little")  # PCM
+        + (1).to_bytes(2, "little")  # channels
+        + (16000).to_bytes(4, "little")  # sample rate
+        + (32000).to_bytes(4, "little")  # byte rate
+        + (2).to_bytes(2, "little")  # block align
+        + (16).to_bytes(2, "little")  # bits per sample
+    )
+    data_chunk = b"data" + len(data).to_bytes(4, "little") + data
+    body = b"WAVE" + fmt_chunk + data_chunk
+    return b"RIFF" + len(body).to_bytes(4, "little") + body
+
+
 def test_intent_correct_ua(client: TestClient) -> None:
     """POST /intents with correct User-Agent returns 200."""
     resp = client.post(
@@ -49,7 +65,7 @@ def test_intent_language_lowercased(client: TestClient) -> None:
 
 def test_wake_word_correct_ua(client: TestClient) -> None:
     """POST /wake_word with correct User-Agent returns 200."""
-    audio = io.BytesIO(b"\x00" * 100)
+    audio = io.BytesIO(make_wav_bytes())
     resp = client.post(
         "/wake_word",
         data={"name": "hey mycroft", "lang": "en-us", "model": "m", "plugin": "p"},
@@ -61,7 +77,7 @@ def test_wake_word_correct_ua(client: TestClient) -> None:
 
 def test_wake_word_wrong_ua(client: TestClient) -> None:
     """POST /wake_word with wrong User-Agent returns 404."""
-    audio = io.BytesIO(b"\x00" * 100)
+    audio = io.BytesIO(make_wav_bytes())
     resp = client.post(
         "/wake_word",
         data={"name": "hey mycroft", "lang": "en-us"},
@@ -86,7 +102,7 @@ def test_wake_word_audio_too_large(client: TestClient) -> None:
 
 def test_stt_correct_ua(client: TestClient) -> None:
     """POST /stt with correct User-Agent returns 200."""
-    audio = io.BytesIO(b"\x00" * 100)
+    audio = io.BytesIO(make_wav_bytes())
     resp = client.post(
         "/stt",
         data={"transcript": "hello world", "lang": "en-us", "model": "m", "plugin": "p"},
@@ -98,7 +114,7 @@ def test_stt_correct_ua(client: TestClient) -> None:
 
 def test_stt_wrong_ua(client: TestClient) -> None:
     """POST /stt with wrong User-Agent returns 404."""
-    audio = io.BytesIO(b"\x00" * 100)
+    audio = io.BytesIO(make_wav_bytes())
     resp = client.post(
         "/stt",
         data={"transcript": "hello world", "lang": "en-us"},

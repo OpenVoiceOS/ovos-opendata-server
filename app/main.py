@@ -8,9 +8,12 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.database import Base, get_engine
 from app.routers import audio, dashboard, data_intake, export, query
+from app.security import limiter
 
 
 @asynccontextmanager
@@ -26,6 +29,10 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+# Rate limiting (per-IP, limit string configurable via RATE_LIMIT env var)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Mount static files
 _static_dir = os.path.join(os.path.dirname(__file__), "static")
