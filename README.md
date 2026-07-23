@@ -53,6 +53,24 @@ uv pip install -e ".[dev]"
 uv run pytest test/ -v --cov=app --cov-report=term-missing
 ```
 
+## Database migrations
+
+Schema changes are managed with [Alembic](https://alembic.sqlalchemy.org/).
+
+- **Production**: run `alembic upgrade head` before starting the server. The
+  Docker image does this automatically on container start.
+- **Development / tests**: the app still calls `Base.metadata.create_all()`
+  on startup for convenience, so a fresh SQLite database works without
+  running migrations first.
+
+To create a new migration after changing `app/models.py`:
+
+```bash
+alembic revision --autogenerate -m "describe the change"
+```
+
+Review the generated file before committing it.
+
 ## License
 
 Apache License 2.0
