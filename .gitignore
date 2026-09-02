@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+.Python
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.coverage
+
+# Distribution
+*.tar.gz
+*.whl
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test artifacts
+test_ovos.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# agent working notes (not shipped)
+TODO.md
+AUDIT.md
+MAINTENANCE_REPORT.md
+SUGGESTIONS.md
+QUICK_FACTS.md

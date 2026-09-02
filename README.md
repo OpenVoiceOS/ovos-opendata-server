@@ -1,104 +1,67 @@
-## **OVOS OpenData Collector 📊**  
+# ovos-opendata-server
 
-A **FastAPI service** for collecting anonymized OVOS usage metrics and data with an **interactive Streamlit dashboard** for visualization.  
+FastAPI service that collects anonymised OVOS device metrics — wake-word samples, STT utterances, and intent matches — into PostgreSQL for open dataset building.
 
-🚀 **Features:**  
-- ✅ **FastAPI backend** to store utterance logs  
-- ✅ **PostgreSQL database** for structured storage  
-- ✅ **Streamlit dashboard** for data analysis  
-- ✅ **Filters, charts, and data export (CSV & JSON)**  
-- ✅ **Dockerized setup for easy deployment**  
-
-
----
-
-## **🛠️ Setup & Installation**  
-
-### ** Clone the Repository**  
-```bash
-git clone https://github.com/TigreGotico/metrics-server-docker
-cd metrics-server-docker
-```
-
-### ** Start the Services**  
-```bash
-docker-compose up --build -d
-```
-This will start:  
-- **FastAPI server** on `http://localhost:8000`  
-- **PostgreSQL database**  
-- **Streamlit dashboard** on `http://localhost:8501`  
-
----
-
-## **📝 API Usage**  
-
-![img_1.png](img_1.png)
-
-### **Submit Data (POST)**  
-
-Send anonymized metrics from OVOS:  
-```bash
-curl -X POST "http://localhost:8000/intents" \
-     -H "User-Agent: ovos-metrics" \
-     -F "utterance=What’s the weather?" \
-     -F "lang=en" \
-     -F "intent=weather" \
-     -F "match_data={\"pipeline\": \"padatious_high\"}"
-```
+## Quick Start
 
 ```bash
-curl -X POST "http://localhost:8000/wake_word" \
-     -H "User-Agent: ovos-metrics" \
-     -F "name=alexa" \
-     -F "model=default" \
-     -F "plugin=mycroft-precise" \
-     -F "plugin_config={\"sensitivity\": 0.5}" \
-     -F "audio=@wakeword.wav"
+cp .env.example .env        # fill in DATABASE_URL and credentials
+docker compose up --build -d
 ```
+
+- API: `http://localhost:8007`
+- Dashboard: `http://localhost:8007/`
+
+## Configuration
+
+All configuration via environment variables (`.env.example` provided):
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `DATABASE_URL` | No | `sqlite:///./ovos_opendata.db` | Database DSN. Defaults to a local SQLite file for easy local/dev use — **production deployments should set this to a PostgreSQL DSN**. |
+| `MAX_AUDIO_SIZE_MB` | No | `10` | Audio upload size cap in MB |
+| `API_KEY` | No | unset | If set, intake endpoints require a matching `X-API-Key` header. Off by default. |
+| `RATE_LIMIT` | No | `60/minute` | Per-IP rate limit applied to the intake endpoints |
+
+Settings are loaded via `app/config.py` (pydantic-settings), which also reads a `.env` file if present. The app is importable and runnable without any environment variables set.
+
+## API Overview
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/intents` | UA | Submit intent match |
+| POST | `/wake_word` | UA | Submit wake-word sample |
+| POST | `/stt` | UA | Submit STT utterance |
+| GET | `/intents` | — | Paginated intent list |
+| GET | `/wake_words` | — | Paginated wake-word list |
+| GET | `/utterances` | — | Paginated utterance list |
+| GET | `/wake_words/{id}/audio` | — | Stream wake-word audio |
+| GET | `/utterances/{id}/audio` | — | Stream utterance audio |
+| GET | `/intents/export` | — | CSV/JSON export |
+| GET | `/wake_words/export` | — | CSV/JSON export |
+| GET | `/utterances/export` | — | CSV/JSON export |
+| GET | `/dashboard/stats` | — | Aggregated stats (60s cache) |
+| GET | `/` | — | Web dashboard |
+| GET | `/status` | — | Health check |
+
+**Auth**: All intake endpoints require `User-Agent: ovos-metrics`.
+
+See [docs/api-reference.md](docs/api-reference.md) for full details.
+
+## Development
 
 ```bash
-curl -X POST "http://localhost:8000/stt" \
-     -H "User-Agent: ovos-metrics" \
-     -F "transcript=What’s the weather?" \
-     -F "model=whisper" \
-     -F "plugin=ovos-stt-plugin-whisper" \
-     -F "plugin_config={\"language\": \"en\"}" \
-     -F "audio=@utterance.wav"
-
+uv pip install -e ".[dev]"
+uv run pytest test/ -v --cov=app --cov-report=term-missing
 ```
 
->NOTE: the user agent **must** be `ovos-metrics` otherwise the request is ignored
+## License
 
+Apache License 2.0
 
----
+## Acknowledgements
 
-## **📊 Streamlit Dashboard**  
-
-
-1️⃣ **Open your browser:** `http://localhost:8501`  
-2️⃣ **Features:**  
-   - 📌 **Filter** by **date range, language, and intent**  
-   - 📊 **Pie charts** for **intent & language distribution**  
-   - 📥 **Export** data to **CSV & JSON**  
-   - 🔄 **Live updates & refresh button**  
-
-
-![img_1.png](output.gif)
-
----
-
-
-## **🤝 Contributing**  
-1. **Fork the repo** & create a new branch  
-2. **Make your changes** & ensure tests pass  
-3. **Submit a pull request** 🎉  
-
----
-
-## **Credits**
-
-This plugin was developed by [TigreGotico](https://tigregotico.pt) for OpenVoiceOS under the [ILENIA](https://proyectoilenia.es) project.
+This project was developed by [TigreGotico](https://tigregotico.pt) for OpenVoiceOS under the [ILENIA](https://proyectoilenia.es) project.
 
 <img src="img.png" width="128"/>
 
