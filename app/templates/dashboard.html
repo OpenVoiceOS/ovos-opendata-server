@@ -12,6 +12,10 @@
     <h1>OVOS Open Data Dashboard</h1>
     <span id="stats-status" class="status-note" role="status" aria-live="polite"></span>
   </header>
+  <p class="strapline">
+    Opt-in, anonymised telemetry from OVOS voice devices, published here as open datasets.
+    <a href="https://github.com/OpenVoiceOS/ovos-opendata-server/blob/dev/privacy.md" target="_blank" rel="noopener">Privacy Policy</a>
+  </p>
 
   <section class="summary-cards" id="summary-cards">
     <div class="card" id="card-intents">
@@ -36,27 +40,27 @@
 
   <!-- Intents Tab -->
   <section class="tab-panel active" id="tab-intents">
+    <h2 class="visually-hidden">Intents</h2>
     <div class="charts-row">
-      <div class="chart-box"><canvas id="chart-lang"></canvas></div>
-      <div class="chart-box"><canvas id="chart-intent"></canvas></div>
+      <div class="chart-box"><canvas id="chart-lang" role="img" aria-label="Language distribution"></canvas></div>
+      <div class="chart-box"><canvas id="chart-intent" role="img" aria-label="Intent distribution"></canvas></div>
       <div class="chart-box" id="card-session">
-        <canvas id="chart-session"></canvas>
-        <p class="card-label">Local vs remote (HiveMind) clients</p>
+        <canvas id="chart-session" role="img" aria-label="Local vs remote (HiveMind) clients"></canvas>
       </div>
     </div>
     <div class="filters">
       <label>Language: <input type="text" id="filter-intent-lang" placeholder="e.g. en-us"></label>
-      <label>Intent: <input type="text" id="filter-intent-name" placeholder="intent name"></label>
-      <label>From: <input type="date" id="filter-intent-from"></label>
-      <label>To: <input type="date" id="filter-intent-to"></label>
+      <label>Intent: <input type="text" id="filter-intent-name" placeholder="intent name" title="Matched intent name, e.g. skill-timer.timer.set"></label>
+      <label>From: <input type="date" id="filter-intent-from" title="Start date, inclusive"></label>
+      <label>To: <input type="date" id="filter-intent-to" title="End date, inclusive"></label>
       <button id="apply-intents" data-action="apply-intents">Apply</button>
       <a id="export-intents-csv" href="/intents/export?format=csv">Export CSV</a>
       <a id="export-intents-json" href="/intents/export?format=json">Export JSON</a>
     </div>
-    <div class="table-status" id="status-intents"></div>
+    <div class="table-status" id="status-intents" role="status" aria-live="polite"></div>
     <div class="table-scroll">
     <table id="table-intents">
-      <thead><tr><th>ID</th><th>Intent</th><th>Language</th><th>Utterance</th><th>Created</th></tr></thead>
+      <thead><tr><th class="col-id">ID</th><th>Intent</th><th>Language</th><th>Utterance</th><th title="Shown in your locale">Created</th></tr></thead>
       <tbody></tbody>
     </table>
     </div>
@@ -65,20 +69,21 @@
 
   <!-- Wake Words Tab -->
   <section class="tab-panel" id="tab-wakewords">
+    <h2 class="visually-hidden">Wake Words</h2>
     <div class="charts-row">
-      <div class="chart-box"><canvas id="chart-ww"></canvas></div>
+      <div class="chart-box"><canvas id="chart-ww" role="img" aria-label="Wake word distribution"></canvas></div>
     </div>
     <div class="filters">
       <label>Name: <input type="text" id="filter-ww-name" placeholder="hey mycroft"></label>
-      <label>Plugin: <input type="text" id="filter-ww-plugin" placeholder="plugin name"></label>
+      <label>Plugin: <input type="text" id="filter-ww-plugin" placeholder="plugin name" title="Wake-word engine plugin module, e.g. ovos-ww-plugin-precise"></label>
       <button id="apply-ww" data-action="apply-ww">Apply</button>
       <a id="export-ww-csv" href="/wake_words/export?format=csv">Export CSV</a>
       <a id="export-ww-json" href="/wake_words/export?format=json">Export JSON</a>
     </div>
-    <div class="table-status" id="status-ww"></div>
+    <div class="table-status" id="status-ww" role="status" aria-live="polite"></div>
     <div class="table-scroll">
     <table id="table-ww">
-      <thead><tr><th>ID</th><th>Wake Word</th><th>Model</th><th>Plugin</th><th>Language</th><th>Created</th><th>Audio</th></tr></thead>
+      <thead><tr><th class="col-id">ID</th><th>Wake Word</th><th title="Model file or identifier used by the plugin">Model</th><th title="Wake-word engine plugin module">Plugin</th><th>Language</th><th title="Shown in your locale">Created</th><th>Audio</th></tr></thead>
       <tbody></tbody>
     </table>
     </div>
@@ -87,18 +92,19 @@
 
   <!-- Utterances Tab -->
   <section class="tab-panel" id="tab-utterances">
+    <h2 class="visually-hidden">Utterances</h2>
     <div class="filters">
       <label>Language: <input type="text" id="filter-utt-lang" placeholder="e.g. en-us"></label>
-      <label>Model: <input type="text" id="filter-utt-model" placeholder="model name"></label>
-      <label>Plugin: <input type="text" id="filter-utt-plugin" placeholder="plugin name"></label>
+      <label>Model: <input type="text" id="filter-utt-model" placeholder="model name" title="STT model file or identifier used by the plugin"></label>
+      <label>Plugin: <input type="text" id="filter-utt-plugin" placeholder="plugin name" title="STT engine plugin module, e.g. ovos-stt-plugin-whisper"></label>
       <button id="apply-utt" data-action="apply-utt">Apply</button>
       <a id="export-utt-csv" href="/utterances/export?format=csv">Export CSV</a>
       <a id="export-utt-json" href="/utterances/export?format=json">Export JSON</a>
     </div>
-    <div class="table-status" id="status-utt"></div>
+    <div class="table-status" id="status-utt" role="status" aria-live="polite"></div>
     <div class="table-scroll">
     <table id="table-utt">
-      <thead><tr><th>ID</th><th>Model</th><th>Plugin</th><th>Language</th><th>Created</th><th>Audio</th></tr></thead>
+      <thead><tr><th class="col-id">ID</th><th title="STT model file or identifier used by the plugin">Model</th><th title="STT engine plugin module">Plugin</th><th>Language</th><th title="Shown in your locale">Created</th><th>Audio</th></tr></thead>
       <tbody></tbody>
     </table>
     </div>
@@ -106,10 +112,10 @@
   </section>
 
   <!-- Audio player modal -->
-  <div id="audio-modal" class="modal hidden">
+  <div id="audio-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="audio-modal-title">
     <div class="modal-content">
       <button class="modal-close" id="modal-close" aria-label="Close">&#x2715;</button>
-      <h3>Audio Playback</h3>
+      <h3 id="audio-modal-title">Audio Playback</h3>
       <audio id="audio-player" controls></audio>
     </div>
   </div>

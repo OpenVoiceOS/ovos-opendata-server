@@ -56,7 +56,7 @@ async function loadStats() {
     renderDoughnut('lang', 'chart-lang', 'Languages', s.language_distribution);
     renderDoughnut('intent', 'chart-intent', 'Intents', s.intent_distribution);
     renderBar('ww', 'chart-ww', 'Wake Words', s.wake_word_distribution);
-    renderDoughnut('session', 'chart-session', 'Local vs Remote', {
+    renderDoughnut('session', 'chart-session', 'Local vs remote (HiveMind) clients', {
       local: s.session_distribution.true,
       remote: s.session_distribution.false,
       unknown: s.session_distribution.unknown,
@@ -69,10 +69,30 @@ async function loadStats() {
   }
 }
 
+// Show/hide a "No data yet" message alongside a chart canvas, without
+// touching the canvas itself (an empty Chart.js instance still needs to
+// exist so later updates have something to update).
+function toggleChartEmptyState(canvasId, isEmpty) {
+  const canvas = document.getElementById(canvasId);
+  canvas.classList.toggle('hidden', isEmpty);
+  let note = canvas.parentElement.querySelector('.chart-empty');
+  if (isEmpty) {
+    if (!note) {
+      note = document.createElement('p');
+      note.className = 'chart-empty';
+      canvas.insertAdjacentElement('afterend', note);
+    }
+    note.textContent = 'No data yet for this category';
+  } else if (note) {
+    note.remove();
+  }
+}
+
 function renderDoughnut(key, canvasId, label, distObj) {
-  const ctx = document.getElementById(canvasId).getContext('2d');
   const labels = Object.keys(distObj);
   const data = Object.values(distObj);
+  toggleChartEmptyState(canvasId, data.every((n) => !n));
+  const ctx = document.getElementById(canvasId).getContext('2d');
   if (charts[key]) {
     charts[key].data.labels = labels;
     charts[key].data.datasets[0].data = data;
@@ -97,9 +117,10 @@ function renderDoughnut(key, canvasId, label, distObj) {
 }
 
 function renderBar(key, canvasId, label, distObj) {
-  const ctx = document.getElementById(canvasId).getContext('2d');
   const labels = Object.keys(distObj);
   const data = Object.values(distObj);
+  toggleChartEmptyState(canvasId, data.every((n) => !n));
+  const ctx = document.getElementById(canvasId).getContext('2d');
   if (charts[key]) {
     charts[key].data.labels = labels;
     charts[key].data.datasets[0].data = data;
@@ -151,10 +172,16 @@ function buildParams(pairs) {
   return p.toString();
 }
 
+// Render an empty-state row spanning every column of a table's tbody.
+function emptyRow(colspan) {
+  return `<tr class="empty-row"><td colspan="${colspan}">No data yet for this category</td></tr>`;
+}
+
 function renderPagination(containerId, total, page, limit, loadFn) {
   const pages = Math.max(1, Math.ceil(total / limit));
   const el = document.getElementById(containerId);
   el.innerHTML = '';
+  if (pages <= 1) return;
   for (let i = 1; i <= pages; i++) {
     const btn = document.createElement('button');
     btn.textContent = i;
@@ -184,9 +211,11 @@ async function loadIntents(page = 1) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const tbody = document.querySelector('#table-intents tbody');
-    tbody.innerHTML = data.items.map((r) =>
-      `<tr><td>${r.id}</td><td>${esc(r.intent)}</td><td>${esc(r.language)}</td><td>${esc(r.utterance)}</td><td>${fmtDate(r.created_at)}</td></tr>`
-    ).join('');
+    tbody.innerHTML = data.items.length
+      ? data.items.map((r) =>
+          `<tr><td>${r.id}</td><td>${esc(r.intent)}</td><td>${esc(r.language)}</td><td>${esc(r.utterance)}</td><td title="${r.created_at ? esc(r.created_at) : ''}">${fmtDate(r.created_at)}</td></tr>`
+        ).join('')
+      : emptyRow(5);
     renderPagination('page-intents', data.total, data.page, data.limit, loadIntents);
     setStatus('status-intents', '', false);
 
@@ -210,9 +239,10 @@ async function loadWakeWords(page = 1) {
     const data = await res.json();
     const tbody = document.querySelector('#table-ww tbody');
     tbody.innerHTML = '';
+    if (!data.items.length) tbody.innerHTML = emptyRow(7);
     data.items.forEach((r) => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${r.id}</td><td>${esc(r.wake_word || '')}</td><td>${esc(r.model || '')}</td><td>${esc(r.plugin || '')}</td><td>${esc(r.language || '')}</td><td>${fmtDate(r.created_at)}</td><td></td>`;
+      tr.innerHTML = `<td>${r.id}</td><td>${esc(r.wake_word || '')}</td><td>${esc(r.model || '')}</td><td>${esc(r.plugin || '')}</td><td>${esc(r.language || '')}</td><td title="${r.created_at ? esc(r.created_at) : ''}">${fmtDate(r.created_at)}</td><td></td>`;
       const playBtn = document.createElement('button');
       playBtn.className = 'play-btn';
       playBtn.textContent = 'Play';
@@ -240,9 +270,10 @@ async function loadUtterances(page = 1) {
     const data = await res.json();
     const tbody = document.querySelector('#table-utt tbody');
     tbody.innerHTML = '';
+    if (!data.items.length) tbody.innerHTML = emptyRow(6);
     data.items.forEach((r) => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${r.id}</td><td>${esc(r.model || '')}</td><td>${esc(r.plugin || '')}</td><td>${esc(r.language || '')}</td><td>${fmtDate(r.created_at)}</td><td></td>`;
+      tr.innerHTML = `<td>${r.id}</td><td>${esc(r.model || '')}</td><td>${esc(r.plugin || '')}</td><td>${esc(r.language || '')}</td><td title="${r.created_at ? esc(r.created_at) : ''}">${fmtDate(r.created_at)}</td><td></td>`;
       const playBtn = document.createElement('button');
       playBtn.className = 'play-btn';
       playBtn.textContent = 'Play';
@@ -267,6 +298,7 @@ async function playAudio(url) {
     const player = document.getElementById('audio-player');
     player.src = blobUrl;
     document.getElementById('audio-modal').classList.remove('hidden');
+    document.getElementById('modal-close').focus();
     player.play();
   } catch (err) {
     alert(`Audio not found: ${err.message}`);
@@ -281,6 +313,9 @@ function closeModal() {
 }
 
 document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('audio-modal').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
 document.getElementById('apply-intents').addEventListener('click', () => loadIntents(1));
 document.getElementById('apply-ww').addEventListener('click', () => loadWakeWords(1));
 document.getElementById('apply-utt').addEventListener('click', () => loadUtterances(1));
@@ -290,6 +325,9 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Formats an ISO timestamp in the browser's own locale; callers also set a
+// `title` attribute with the raw ISO value so the exact instant is always
+// recoverable regardless of locale ambiguity.
 function fmtDate(iso) {
   if (!iso) return '—';
   return new Date(iso).toLocaleString();

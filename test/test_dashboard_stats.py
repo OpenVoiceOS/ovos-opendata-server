@@ -158,6 +158,35 @@ def test_dashboard_html_no_cdn_or_inline_handlers(client: TestClient) -> None:
     assert "onclick=" not in body
 
 
+def test_dashboard_html_strapline_and_privacy_link(client: TestClient) -> None:
+    """GET / states what the site is and links the privacy policy near the heading."""
+    resp = client.get("/")
+    body = resp.text
+    assert "opt-in" in body.lower()
+    assert "anonymised" in body.lower()
+    assert "privacy.md" in body
+
+
+def test_dashboard_html_no_duplicate_session_caption(client: TestClient) -> None:
+    """#card-session carries its caption on the canvas (aria-label), not in a separate <p> too."""
+    resp = client.get("/")
+    body = resp.text
+    session_card = body[body.index('id="card-session"'):body.index('id="card-session"') + 400]
+    assert "<p class=\"card-label\">" not in session_card
+    assert "Local vs remote (HiveMind) clients" in session_card
+
+
+def test_dashboard_html_accessibility_attributes(client: TestClient) -> None:
+    """GET / carries the expected ARIA roles for status regions, charts, and the modal."""
+    resp = client.get("/")
+    body = resp.text
+    assert body.count('role="status"') >= 4
+    assert body.count('role="img"') == 4
+    assert 'role="dialog"' in body
+    assert 'aria-modal="true"' in body
+    assert "<h2" in body
+
+
 def test_dashboard_vendored_chartjs_served(client: TestClient) -> None:
     """The vendored Chart.js UMD build is served from /static."""
     resp = client.get("/static/js/vendor/chart.umd.min.js")
