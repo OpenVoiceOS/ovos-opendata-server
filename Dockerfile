@@ -1,4 +1,4 @@
-FROM python:3.11.9-slim
+FROM python:3.14.7-slim
 WORKDIR /app
 COPY pyproject.toml .
 RUN pip install --no-cache-dir .
