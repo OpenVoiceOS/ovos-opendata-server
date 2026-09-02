@@ -59,7 +59,7 @@ curl -s "https://metrics.tigregotico.pt/wake_words/export?format=json&name=hey+m
 ## What the columns mean
 
 **Intents** (`/intents/export`): `id`, `intent`, `language`, `utterance`,
-`pipeline`, `core_version`, `timestamp`.
+`pipeline`, `core_version`, `session_default`, `timestamp`.
 
 - `intent` — the matched intent's registered name.
 - `language` — BCP-47 tag, always lowercase (the server normalizes it on
@@ -74,6 +74,11 @@ curl -s "https://metrics.tigregotico.pt/wake_words/export?format=json&name=hey+m
   this record. Useful for filtering out data from very old or unsupported
   versions, or for tracking how behavior changes across `ovos-core` releases.
   May be empty on older devices.
+- `session_default` — `true` if the reporting session used the device's
+  default session id, `false` otherwise, or empty if the reporting device is
+  too old to send it. Since remote clients (e.g. HiveMind satellites) always
+  carry a non-default session, `false` is a privacy-respecting proxy for
+  counting remote/HiveMind usage without ever storing a session id itself.
 
 **Wake words** (`/wake_words/export`): `id`, `name`, `model`, `plugin`,
 `language`, `timestamp`, plus the audio (fetched separately by `id`).

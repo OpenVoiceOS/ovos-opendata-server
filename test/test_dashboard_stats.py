@@ -85,6 +85,46 @@ def test_dashboard_stats_distributions(client: TestClient) -> None:
     assert "hey mycroft" in data["wake_word_distribution"]
 
 
+def test_dashboard_stats_session_distribution(client: TestClient) -> None:
+    """session_distribution buckets intents by session_default true/false/unknown."""
+    from app.routers import dashboard as dash_mod
+    dash_mod._stats_cache = (None, 0.0)
+
+    client.post(
+        "/intents",
+        data={
+            "utterance": "local one",
+            "intent": "LocalSkill",
+            "lang": "en-us",
+            "session_default": "true",
+        },
+        headers=OVOS_HEADERS,
+    )
+    client.post(
+        "/intents",
+        data={
+            "utterance": "remote one",
+            "intent": "RemoteSkill",
+            "lang": "en-us",
+            "session_default": "false",
+        },
+        headers=OVOS_HEADERS,
+    )
+    client.post(
+        "/intents",
+        data={"utterance": "legacy one", "intent": "LegacySkill", "lang": "en-us"},
+        headers=OVOS_HEADERS,
+    )
+    dash_mod._stats_cache = (None, 0.0)
+
+    resp = client.get("/dashboard/stats")
+    assert resp.status_code == 200
+    dist = resp.json()["session_distribution"]
+    assert dist["true"] >= 1
+    assert dist["false"] >= 1
+    assert dist["unknown"] >= 1
+
+
 def test_dashboard_html(client: TestClient) -> None:
     """GET / returns HTML dashboard page."""
     resp = client.get("/")

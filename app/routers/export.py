@@ -67,6 +67,7 @@ def export_intents(
                 "utterance",
                 "pipeline",
                 "core_version",
+                "session_default",
                 "timestamp",
             ]
         )
@@ -79,6 +80,7 @@ def export_intents(
                     r.utterance,
                     r.pipeline,
                     r.core_version,
+                    r.session_default,
                     r.timestamp,
                 ]
             )
@@ -96,6 +98,7 @@ def export_intents(
             "utterance": r.utterance,
             "pipeline": r.pipeline,
             "core_version": r.core_version,
+            "session_default": r.session_default,
             "timestamp": r.timestamp.isoformat() if r.timestamp else None,
         }
         for r in rows

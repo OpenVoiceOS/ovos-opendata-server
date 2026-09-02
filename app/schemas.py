@@ -21,6 +21,7 @@ class IntentRecord(BaseModel):
     utterance: str
     pipeline: Optional[str] = None
     core_version: Optional[str] = None
+    session_default: Optional[bool] = None
     created_at: Optional[datetime] = None
 
 
@@ -68,3 +69,4 @@ class DashboardStats(BaseModel):
     intent_distribution: Dict[str, int]
     language_distribution: Dict[str, int]
     wake_word_distribution: Dict[str, int]
+    session_distribution: Dict[str, int]

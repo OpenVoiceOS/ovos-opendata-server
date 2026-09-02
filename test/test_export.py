@@ -58,6 +58,31 @@ def test_intents_export_json(client: TestClient) -> None:
     assert "intent" in data[0]
 
 
+def test_intents_export_includes_session_default(client: TestClient) -> None:
+    """Both CSV and JSON intent exports include the session_default column."""
+    client.post(
+        "/intents",
+        data={
+            "utterance": "remote command",
+            "intent": "RemoteSkill",
+            "lang": "en-us",
+            "session_default": "false",
+        },
+        headers=OVOS_HEADERS,
+    )
+
+    csv_resp = client.get("/intents/export?format=csv")
+    reader = csv.DictReader(io.StringIO(csv_resp.text))
+    assert "session_default" in reader.fieldnames
+    row = next(r for r in reader if r["intent"] == "RemoteSkill")
+    assert row["session_default"] == "False"
+
+    json_resp = client.get("/intents/export?format=json")
+    data = json.loads(json_resp.content)
+    match = next(r for r in data if r["intent"] == "RemoteSkill")
+    assert match["session_default"] is False
+
+
 def test_intents_export_filter(client: TestClient) -> None:
     """Export respects lang filter."""
     _seed(client)

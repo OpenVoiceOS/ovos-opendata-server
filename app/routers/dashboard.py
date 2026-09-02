@@ -62,6 +62,17 @@ def _compute_stats(db: Session) -> Dict[str, Any]:
         if name:
             ww_dist[name] = count
 
+    session_dist: Dict[str, int] = {"true": 0, "false": 0, "unknown": 0}
+    for session_default, count in (
+        db.query(Intent.session_default, func.count(Intent.id)).group_by(Intent.session_default).all()
+    ):
+        if session_default is True:
+            session_dist["true"] = count
+        elif session_default is False:
+            session_dist["false"] = count
+        else:
+            session_dist["unknown"] = count
+
     return {
         "total_intents": total_intents,
         "total_wake_words": total_wake_words,
@@ -69,6 +80,7 @@ def _compute_stats(db: Session) -> Dict[str, Any]:
         "intent_distribution": intent_dist,
         "language_distribution": lang_dist,
         "wake_word_distribution": ww_dist,
+        "session_distribution": session_dist,
     }
 
 

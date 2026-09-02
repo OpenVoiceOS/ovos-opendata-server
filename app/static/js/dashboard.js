@@ -8,6 +8,7 @@ const charts = {
   lang: null,
   intent: null,
   ww: null,
+  session: null,
 };
 
 // ---- Theme-aware Chart.js palette ----
@@ -55,6 +56,11 @@ async function loadStats() {
     renderDoughnut('lang', 'chart-lang', 'Languages', s.language_distribution);
     renderDoughnut('intent', 'chart-intent', 'Intents', s.intent_distribution);
     renderBar('ww', 'chart-ww', 'Wake Words', s.wake_word_distribution);
+    renderDoughnut('session', 'chart-session', 'Local vs Remote', {
+      local: s.session_distribution.true,
+      remote: s.session_distribution.false,
+      unknown: s.session_distribution.unknown,
+    });
 
     statusEl.textContent = `Updated ${new Date().toLocaleTimeString()}`;
   } catch (err) {

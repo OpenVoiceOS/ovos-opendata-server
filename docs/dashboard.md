@@ -20,6 +20,11 @@ Tab buttons switch between panels client-side; no page reload occurs.
 
 - Language doughnut chart and intent doughnut chart, rendered from
   `/dashboard/stats`.
+- A "Local vs remote (HiveMind) clients" doughnut chart, driven by
+  `session_distribution` — a privacy-respecting proxy that only ever counts a
+  boolean (whether the reporting session used the default session id), never
+  a session id itself; older devices that don't send the flag are counted as
+  "unknown".
 - Filters: language, intent name, date range.
 - Paginated table (50 rows/page) with ID, intent, language, utterance, and
   timestamp.
