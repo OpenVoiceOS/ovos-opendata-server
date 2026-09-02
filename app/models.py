@@ -21,6 +21,8 @@ class Intent(Base):
     intent: Mapped[str] = mapped_column(String, nullable=False)
     language: Mapped[str] = mapped_column(String, nullable=False)
     match_data: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    pipeline: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    core_version: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     timestamp: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )

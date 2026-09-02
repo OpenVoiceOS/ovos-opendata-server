@@ -75,6 +75,8 @@ def list_intents(
             intent=r.intent,
             language=r.language,
             utterance=r.utterance,
+            pipeline=r.pipeline,
+            core_version=r.core_version,
             created_at=r.timestamp,
         )
         for r in items
