@@ -15,6 +15,10 @@ A public instance, run by the OVOS community, is available at
 dashboard at [https://opendata.tigregotico.pt](https://opendata.tigregotico.pt).
 You can also run your own — see [docs/self-hosting.md](docs/self-hosting.md).
 
+![Dashboard screenshot](docs/img/dashboard-desktop.png)
+
+See [docs/dashboard.md](docs/dashboard.md) for a full tour of the dashboard.
+
 ## Quick Start
 
 ```bash
