@@ -12,6 +12,10 @@ docker compose up --build -d
 - API: `http://localhost:8007`
 - Dashboard: `http://localhost:8007/`
 
+### Docker image
+
+Tagged releases (`v*`) are published to `ghcr.io/openvoiceos/ovos-opendata-server`.
+
 ## Configuration
 
 All configuration via environment variables (`.env.example` provided):
