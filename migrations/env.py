@@ -5,7 +5,9 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
+from sqlalchemy import engine_from_config, inspect, pool
 
 from app.config import get_settings
 from app.database import Base
@@ -48,6 +50,29 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+def stamp_baseline_if_needed(connectable) -> None:
+    """Stamp pre-alembic databases at 0001 instead of re-creating existing tables.
+
+    Databases created before alembic was introduced (via Base.metadata.create_all)
+    already have the 0001 tables but no alembic_version table. Without this guard,
+    'alembic upgrade head' tries to run 0001's create_table again and crashes with
+    "table already exists". If the intents table is present but alembic_version is
+    not, stamp the revision history at 0001 so upgrade head proceeds from 0002.
+
+    Uses its own short-lived connection (committed and closed before returning)
+    so it never leaves an open implicit transaction on the connection alembic's
+    own migration run subsequently takes over.
+    """
+    with connectable.connect() as connection:
+        inspector = inspect(connection)
+        tables = set(inspector.get_table_names())
+        if "intents" in tables and "alembic_version" not in tables:
+            script = ScriptDirectory.from_config(config)
+            migration_context = MigrationContext.configure(connection)
+            migration_context.stamp(script, "0001")
+        connection.commit()
+
+
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
@@ -61,6 +86,8 @@ def run_migrations_online() -> None:
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
+
+    stamp_baseline_if_needed(connectable)
 
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)

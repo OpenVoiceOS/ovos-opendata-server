@@ -5,7 +5,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, Integer, LargeBinary, String, func
+from sqlalchemy import Boolean, DateTime, Integer, LargeBinary, String, func
 from sqlalchemy.orm import Mapped, mapped_column, validates
 
 from app.database import Base
@@ -23,6 +23,7 @@ class Intent(Base):
     match_data: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     pipeline: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     core_version: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    session_default: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
     timestamp: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )

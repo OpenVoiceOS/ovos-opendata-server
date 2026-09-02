@@ -2,6 +2,8 @@
 # Licensed under the Apache License, Version 2.0
 """Data intake POST endpoints for OVOS device metrics collection."""
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy.orm import Session
 
@@ -11,6 +13,26 @@ from app.models import Intent, Utterance, WakeWord
 from app.security import limiter, require_api_key, validate_wav
 
 router = APIRouter()
+
+
+def parse_optional_bool(value: Optional[str]) -> Optional[bool]:
+    """Parse a form-encoded optional boolean string ('true'/'false', case-insensitive).
+
+    Args:
+        value: Raw form value, or None if the field was not sent.
+
+    Returns:
+        True/False if the value parses as a boolean, otherwise None (absent
+        or unrecognized values are treated as unknown, never defaulted).
+    """
+    if value is None:
+        return None
+    lowered = value.strip().lower()
+    if lowered == "true":
+        return True
+    if lowered == "false":
+        return False
+    return None
 
 
 def require_ovos_agent(request: Request) -> None:
@@ -52,6 +74,7 @@ async def upload_intent(
     match_data: str = Form(None),
     pipeline: str = Form(None),
     core_version: str = Form(None),
+    session_default: str = Form(None),
     db: Session = Depends(get_db),
     _: None = Depends(require_ovos_agent),
     __: None = Depends(require_api_key),
@@ -67,6 +90,10 @@ async def upload_intent(
         pipeline: Optional pipe-joined string of pipeline stages that were
             attempted before this intent matched (e.g. "adapt_high|padatious_high").
         core_version: Optional ovos-core version string of the reporting device.
+        session_default: Optional 'true'/'false' string flagging whether the
+            reporting session used the default session id — a privacy-respecting
+            proxy for local vs. remote (HiveMind) clients. Absent or
+            unrecognized values are stored as NULL (unknown), never defaulted.
         db: Database session.
         _: require_ovos_agent dependency result (unused).
         __: require_api_key dependency result (unused).
@@ -81,6 +108,7 @@ async def upload_intent(
         match_data=match_data,
         pipeline=pipeline,
         core_version=core_version,
+        session_default=parse_optional_bool(session_default),
     )
     db.add(record)
     db.commit()

@@ -101,6 +101,59 @@ def test_intent_pipeline_and_core_version_optional(client: TestClient) -> None:
     assert match["core_version"] is None
 
 
+def test_intent_session_default_true(client: TestClient) -> None:
+    """POST /intents with session_default=true is stored and exposed as True."""
+    resp = client.post(
+        "/intents",
+        data={
+            "utterance": "hello",
+            "intent": "SessionSkill.local",
+            "lang": "en-us",
+            "session_default": "true",
+        },
+        headers=OVOS_HEADERS,
+    )
+    assert resp.status_code == 200
+    q = client.get("/intents?intent=SessionSkill.local")
+    match = next(i for i in q.json()["items"] if i["intent"] == "SessionSkill.local")
+    assert match["session_default"] is True
+
+
+def test_intent_session_default_false(client: TestClient) -> None:
+    """POST /intents with session_default=false is stored and exposed as False."""
+    resp = client.post(
+        "/intents",
+        data={
+            "utterance": "hello",
+            "intent": "SessionSkill.remote",
+            "lang": "en-us",
+            "session_default": "false",
+        },
+        headers=OVOS_HEADERS,
+    )
+    assert resp.status_code == 200
+    q = client.get("/intents?intent=SessionSkill.remote")
+    match = next(i for i in q.json()["items"] if i["intent"] == "SessionSkill.remote")
+    assert match["session_default"] is False
+
+
+def test_intent_session_default_absent_is_unknown(client: TestClient) -> None:
+    """POST /intents without session_default stores NULL, not a default value."""
+    resp = client.post(
+        "/intents",
+        data={
+            "utterance": "hello",
+            "intent": "SessionSkill.legacy",
+            "lang": "en-us",
+        },
+        headers=OVOS_HEADERS,
+    )
+    assert resp.status_code == 200
+    q = client.get("/intents?intent=SessionSkill.legacy")
+    match = next(i for i in q.json()["items"] if i["intent"] == "SessionSkill.legacy")
+    assert match["session_default"] is None
+
+
 def test_wake_word_correct_ua(client: TestClient) -> None:
     """POST /wake_word with correct User-Agent returns 200."""
     audio = io.BytesIO(make_wav_bytes())
