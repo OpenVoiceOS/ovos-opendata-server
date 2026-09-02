@@ -10,6 +10,22 @@ from fastapi.testclient import TestClient
 OVOS_HEADERS = {"User-Agent": "ovos-metrics"}
 
 
+def _make_wav_bytes(data_size: int = 20) -> bytes:
+    """Build a minimal, valid WAV file's bytes (RIFF/WAVE header + fmt/data chunks)."""
+    data = b"\x00" * data_size
+    fmt_chunk = b"fmt " + (16).to_bytes(4, "little") + (
+        (1).to_bytes(2, "little")  # PCM
+        + (1).to_bytes(2, "little")  # channels
+        + (16000).to_bytes(4, "little")  # sample rate
+        + (32000).to_bytes(4, "little")  # byte rate
+        + (2).to_bytes(2, "little")  # block align
+        + (16).to_bytes(2, "little")  # bits per sample
+    )
+    data_chunk = b"data" + len(data).to_bytes(4, "little") + data
+    body = b"WAVE" + fmt_chunk + data_chunk
+    return b"RIFF" + len(body).to_bytes(4, "little") + body
+
+
 def _seed(client: TestClient) -> None:
     client.post(
         "/intents",
@@ -21,7 +37,7 @@ def _seed(client: TestClient) -> None:
         data={"utterance": "weather", "intent": "WeatherSkill", "lang": "de-de"},
         headers=OVOS_HEADERS,
     )
-    audio = io.BytesIO(b"RIFF\x00\x00\x00\x00WAVE")
+    audio = io.BytesIO(_make_wav_bytes())
     client.post(
         "/wake_word",
         data={"name": "hey mycroft", "lang": "en-us", "model": "m", "plugin": "p"},
@@ -75,6 +91,38 @@ def test_dashboard_html(client: TestClient) -> None:
     assert resp.status_code == 200
     assert "text/html" in resp.headers["content-type"]
     assert "OVOS" in resp.text
+
+
+def test_dashboard_html_expected_elements(client: TestClient) -> None:
+    """GET / includes the expected card, tab, and footer element ids."""
+    resp = client.get("/")
+    assert resp.status_code == 200
+    body = resp.text
+    for element_id in (
+        "stat-intents",
+        "stat-wakewords",
+        "stat-utterances",
+        "tab-btn-intents",
+        "tab-btn-wakewords",
+        "tab-btn-utterances",
+        "dashboard-footer",
+    ):
+        assert f'id="{element_id}"' in body
+
+
+def test_dashboard_html_no_cdn_or_inline_handlers(client: TestClient) -> None:
+    """GET / does not load Chart.js from a CDN and has no inline onclick handlers."""
+    resp = client.get("/")
+    body = resp.text
+    assert "cdn.jsdelivr" not in body
+    assert "onclick=" not in body
+
+
+def test_dashboard_vendored_chartjs_served(client: TestClient) -> None:
+    """The vendored Chart.js UMD build is served from /static."""
+    resp = client.get("/static/js/vendor/chart.umd.min.js")
+    assert resp.status_code == 200
+    assert "Chart" in resp.text
 
 
 def test_status_endpoint(client: TestClient) -> None:

@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OVOS Open Data Dashboard</title>
   <link rel="stylesheet" href="/static/css/dashboard.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/static/js/vendor/chart.umd.min.js"></script>
 </head>
 <body>
   <header>
     <h1>OVOS Open Data Dashboard</h1>
+    <span id="stats-status" class="status-note" role="status" aria-live="polite"></span>
   </header>
 
-  <section class="summary-cards">
+  <section class="summary-cards" id="summary-cards">
     <div class="card" id="card-intents">
       <div class="card-label">Total Intents</div>
       <div class="card-value" id="stat-intents">—</div>
@@ -27,10 +28,10 @@
     </div>
   </section>
 
-  <nav class="tabs">
-    <button class="tab-btn active" data-tab="intents">Intents</button>
-    <button class="tab-btn" data-tab="wakewords">Wake Words</button>
-    <button class="tab-btn" data-tab="utterances">Utterances</button>
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" id="tab-btn-intents" data-tab="intents">Intents</button>
+    <button class="tab-btn" id="tab-btn-wakewords" data-tab="wakewords">Wake Words</button>
+    <button class="tab-btn" id="tab-btn-utterances" data-tab="utterances">Utterances</button>
   </nav>
 
   <!-- Intents Tab -->
@@ -44,14 +45,17 @@
       <label>Intent: <input type="text" id="filter-intent-name" placeholder="intent name"></label>
       <label>From: <input type="date" id="filter-intent-from"></label>
       <label>To: <input type="date" id="filter-intent-to"></label>
-      <button onclick="loadIntents(1)">Apply</button>
+      <button id="apply-intents" data-action="apply-intents">Apply</button>
       <a id="export-intents-csv" href="/intents/export?format=csv">Export CSV</a>
       <a id="export-intents-json" href="/intents/export?format=json">Export JSON</a>
     </div>
+    <div class="table-status" id="status-intents"></div>
+    <div class="table-scroll">
     <table id="table-intents">
       <thead><tr><th>ID</th><th>Intent</th><th>Language</th><th>Utterance</th><th>Created</th></tr></thead>
       <tbody></tbody>
     </table>
+    </div>
     <div class="pagination" id="page-intents"></div>
   </section>
 
@@ -63,14 +67,17 @@
     <div class="filters">
       <label>Name: <input type="text" id="filter-ww-name" placeholder="hey mycroft"></label>
       <label>Plugin: <input type="text" id="filter-ww-plugin" placeholder="plugin name"></label>
-      <button onclick="loadWakeWords(1)">Apply</button>
+      <button id="apply-ww" data-action="apply-ww">Apply</button>
       <a id="export-ww-csv" href="/wake_words/export?format=csv">Export CSV</a>
       <a id="export-ww-json" href="/wake_words/export?format=json">Export JSON</a>
     </div>
+    <div class="table-status" id="status-ww"></div>
+    <div class="table-scroll">
     <table id="table-ww">
       <thead><tr><th>ID</th><th>Wake Word</th><th>Model</th><th>Plugin</th><th>Language</th><th>Created</th><th>Audio</th></tr></thead>
       <tbody></tbody>
     </table>
+    </div>
     <div class="pagination" id="page-ww"></div>
   </section>
 
@@ -80,25 +87,38 @@
       <label>Language: <input type="text" id="filter-utt-lang" placeholder="e.g. en-us"></label>
       <label>Model: <input type="text" id="filter-utt-model" placeholder="model name"></label>
       <label>Plugin: <input type="text" id="filter-utt-plugin" placeholder="plugin name"></label>
-      <button onclick="loadUtterances(1)">Apply</button>
+      <button id="apply-utt" data-action="apply-utt">Apply</button>
       <a id="export-utt-csv" href="/utterances/export?format=csv">Export CSV</a>
       <a id="export-utt-json" href="/utterances/export?format=json">Export JSON</a>
     </div>
+    <div class="table-status" id="status-utt"></div>
+    <div class="table-scroll">
     <table id="table-utt">
       <thead><tr><th>ID</th><th>Model</th><th>Plugin</th><th>Language</th><th>Created</th><th>Audio</th></tr></thead>
       <tbody></tbody>
     </table>
+    </div>
     <div class="pagination" id="page-utt"></div>
   </section>
 
   <!-- Audio player modal -->
   <div id="audio-modal" class="modal hidden">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+      <button class="modal-close" id="modal-close" aria-label="Close">&#x2715;</button>
       <h3>Audio Playback</h3>
       <audio id="audio-player" controls></audio>
     </div>
   </div>
+
+  <footer id="dashboard-footer">
+    <a href="/docs" target="_blank" rel="noopener">API Docs</a>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/OpenVoiceOS/ovos-opendata-server/blob/dev/privacy.md" target="_blank" rel="noopener">Privacy Policy</a>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/OpenVoiceOS/ovos-opendata-server/blob/dev/FAQ.md" target="_blank" rel="noopener">FAQ</a>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/OpenVoiceOS/ovos-opendata-server" target="_blank" rel="noopener">GitHub</a>
+  </footer>
 
   <script src="/static/js/dashboard.js"></script>
 </body>
