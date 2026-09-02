@@ -59,9 +59,29 @@ def export_intents(
     if format == "csv":
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow(["id", "intent", "language", "utterance", "timestamp"])
+        writer.writerow(
+            [
+                "id",
+                "intent",
+                "language",
+                "utterance",
+                "pipeline",
+                "core_version",
+                "timestamp",
+            ]
+        )
         for r in rows:
-            writer.writerow([r.id, r.intent, r.language, r.utterance, r.timestamp])
+            writer.writerow(
+                [
+                    r.id,
+                    r.intent,
+                    r.language,
+                    r.utterance,
+                    r.pipeline,
+                    r.core_version,
+                    r.timestamp,
+                ]
+            )
         output.seek(0)
         return StreamingResponse(
             iter([output.read()]),
@@ -74,6 +94,8 @@ def export_intents(
             "intent": r.intent,
             "language": r.language,
             "utterance": r.utterance,
+            "pipeline": r.pipeline,
+            "core_version": r.core_version,
             "timestamp": r.timestamp.isoformat() if r.timestamp else None,
         }
         for r in rows

@@ -50,6 +50,8 @@ async def upload_intent(
     intent: str = Form(...),
     lang: str = Form(...),
     match_data: str = Form(None),
+    pipeline: str = Form(None),
+    core_version: str = Form(None),
     db: Session = Depends(get_db),
     _: None = Depends(require_ovos_agent),
     __: None = Depends(require_api_key),
@@ -62,6 +64,9 @@ async def upload_intent(
         intent: The matched intent name.
         lang: BCP-47 language tag (will be normalized to lowercase).
         match_data: Optional JSON string of intent match details.
+        pipeline: Optional pipe-joined string of pipeline stages that were
+            attempted before this intent matched (e.g. "adapt_high|padatious_high").
+        core_version: Optional ovos-core version string of the reporting device.
         db: Database session.
         _: require_ovos_agent dependency result (unused).
         __: require_api_key dependency result (unused).
@@ -74,6 +79,8 @@ async def upload_intent(
         intent=intent,
         language=lang,
         match_data=match_data,
+        pipeline=pipeline,
+        core_version=core_version,
     )
     db.add(record)
     db.commit()
