@@ -14,15 +14,15 @@ list; a few common pulls:
 ```bash
 # every English intent match, as CSV
 curl -o intents_en.csv \
-  "https://metrics.tigregotico.pt/intents/export?format=csv&lang=en-us"
+  "https://metrics.openvoiceos.pt/intents/export?format=csv&lang=en-us"
 
 # every wake-word record for a specific wake word, as JSON
 curl -o hey_mycroft.json \
-  "https://metrics.tigregotico.pt/wake_words/export?format=json&name=hey+mycroft"
+  "https://metrics.openvoiceos.pt/wake_words/export?format=json&name=hey+mycroft"
 
 # intents in a date range
 curl -o intents_january.csv \
-  "https://metrics.tigregotico.pt/intents/export?format=csv&date_from=2026-01-01T00:00:00&date_to=2026-01-31T23:59:59"
+  "https://metrics.openvoiceos.pt/intents/export?format=csv&date_from=2026-01-01T00:00:00&date_to=2026-01-31T23:59:59"
 ```
 
 Exports cap at 100,000 rows per request. If you need more, split the pull by
@@ -40,8 +40,8 @@ metadata. To fetch the actual WAV for a wake-word or STT record, grab its `id`
 from a list/export and request it individually:
 
 ```bash
-curl -o sample.wav "https://metrics.tigregotico.pt/wake_words/42/audio"
-curl -o utterance.wav "https://metrics.tigregotico.pt/utterances/17/audio"
+curl -o sample.wav "https://metrics.openvoiceos.pt/wake_words/42/audio"
+curl -o utterance.wav "https://metrics.openvoiceos.pt/utterances/17/audio"
 ```
 
 A batch download loop is straightforward:
@@ -49,10 +49,10 @@ A batch download loop is straightforward:
 ```bash
 #!/usr/bin/env bash
 # download every wake-word audio file matching a name filter
-curl -s "https://metrics.tigregotico.pt/wake_words/export?format=json&name=hey+mycroft" \
+curl -s "https://metrics.openvoiceos.pt/wake_words/export?format=json&name=hey+mycroft" \
   | jq -r '.[].id' \
   | while read -r id; do
-      curl -s -o "wake_words/${id}.wav" "https://metrics.tigregotico.pt/wake_words/${id}/audio"
+      curl -s -o "wake_words/${id}.wav" "https://metrics.openvoiceos.pt/wake_words/${id}/audio"
     done
 ```
 

@@ -11,8 +11,8 @@ full policy, and [docs/connecting-devices.md](docs/connecting-devices.md) for
 exactly what each upload contains.
 
 A public instance, run by the OVOS community, is available at
-[https://metrics.tigregotico.pt](https://metrics.tigregotico.pt) with a
-dashboard at [https://opendata.tigregotico.pt](https://opendata.tigregotico.pt).
+[https://metrics.openvoiceos.pt](https://metrics.openvoiceos.pt) with a
+dashboard at [https://metrics.openvoiceos.pt/dashboard/stats](https://metrics.openvoiceos.pt/dashboard/stats).
 You can also run your own — see [docs/self-hosting.md](docs/self-hosting.md).
 
 ![Dashboard screenshot](docs/img/dashboard-desktop.png)
