@@ -6,7 +6,7 @@ import time
 from typing import Any, Dict, Optional, Tuple
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -100,6 +100,18 @@ def get_dashboard_stats(db: Session = Depends(get_db)) -> DashboardStats:
         cached = _compute_stats(db)
         _stats_cache = (cached, time.monotonic() + get_settings().dashboard_cache_ttl)
     return DashboardStats(**cached)
+
+
+@router.get("/dashboard")
+def redirect_dashboard() -> RedirectResponse:
+    """Redirect GET /dashboard to /dashboard/stats."""
+    return RedirectResponse(url="/dashboard/stats", status_code=307)
+
+
+@router.get("/dashboard/")
+def redirect_dashboard_slash() -> RedirectResponse:
+    """Redirect GET /dashboard/ to /dashboard/stats."""
+    return RedirectResponse(url="/dashboard/stats", status_code=307)
 
 
 @router.get("/", response_class=HTMLResponse)

@@ -199,3 +199,17 @@ def test_status_endpoint(client: TestClient) -> None:
     resp = client.get("/status")
     assert resp.status_code == 200
     assert resp.json()["status"] == "success"
+
+
+def test_dashboard_redirect(client: TestClient) -> None:
+    """GET /dashboard redirects to /dashboard/stats."""
+    resp = client.get("/dashboard", follow_redirects=False)
+    assert resp.status_code == 307
+    assert resp.headers["location"].endswith("/dashboard/stats")
+
+
+def test_dashboard_slash_redirect(client: TestClient) -> None:
+    """GET /dashboard/ redirects to /dashboard/stats."""
+    resp = client.get("/dashboard/", follow_redirects=False)
+    assert resp.status_code == 307
+    assert resp.headers["location"].endswith("/dashboard/stats")
