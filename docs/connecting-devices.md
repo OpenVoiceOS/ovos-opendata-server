@@ -26,9 +26,9 @@ independent — set only the ones you want.
 ```json
 {
   "open_data": {
-    "intent_urls": ["https://metrics.tigregotico.pt/intents"],
-    "ww_urls": ["https://metrics.tigregotico.pt/wake_word"],
-    "stt_urls": ["https://metrics.tigregotico.pt/stt"]
+    "intent_urls": ["https://metrics.openvoiceos.pt/intents"],
+    "ww_urls": ["https://metrics.openvoiceos.pt/wake_word"],
+    "stt_urls": ["https://metrics.openvoiceos.pt/stt"]
   }
 }
 ```
@@ -50,7 +50,7 @@ audio recordings, set only `intent_urls`:
 ```json
 {
   "open_data": {
-    "intent_urls": ["https://metrics.tigregotico.pt/intents"]
+    "intent_urls": ["https://metrics.openvoiceos.pt/intents"]
   }
 }
 ```
@@ -115,7 +115,7 @@ at a server you control and delete records there directly.
 ## Verifying uploads are arriving
 
 The dashboard (`/` on your server, or
-[https://opendata.tigregotico.pt](https://opendata.tigregotico.pt) for the
+[https://metrics.openvoiceos.pt/dashboard/stats](https://metrics.openvoiceos.pt/dashboard/stats) for the
 public instance) shows live counts and lets you filter by language, intent,
 or wake word. After triggering your assistant a few times, refresh the
 dashboard and look for your samples in the relevant tab.
@@ -124,7 +124,7 @@ You can also query the API directly. For example, to see the most recent
 intent matches for your language:
 
 ```bash
-curl "https://metrics.tigregotico.pt/intents?lang=en-us&limit=5"
+curl "https://metrics.openvoiceos.pt/intents?lang=en-us&limit=5"
 ```
 
 If nothing shows up:

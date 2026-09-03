@@ -1,6 +1,6 @@
 # API Reference
 
-Base URL for the public instance: `https://metrics.tigregotico.pt`. For a
+Base URL for the public instance: `https://metrics.openvoiceos.pt`. For a
 self-hosted instance, substitute your own host.
 
 ## Intake Endpoints
@@ -31,7 +31,7 @@ per client IP (`RATE_LIMIT`, default `60/minute`).
 **Examples**
 
 ```bash
-curl -X POST https://metrics.tigregotico.pt/intents \
+curl -X POST https://metrics.openvoiceos.pt/intents \
   -H "User-Agent: ovos-metrics" \
   -F utterance="what time is it" \
   -F intent="query_time" \
@@ -41,7 +41,7 @@ curl -X POST https://metrics.tigregotico.pt/intents \
 ```
 
 ```bash
-curl -X POST https://metrics.tigregotico.pt/wake_word \
+curl -X POST https://metrics.openvoiceos.pt/wake_word \
   -H "User-Agent: ovos-metrics" \
   -F name="hey mycroft" \
   -F lang="en-us" \
@@ -51,7 +51,7 @@ curl -X POST https://metrics.tigregotico.pt/wake_word \
 ```
 
 ```bash
-curl -X POST https://metrics.tigregotico.pt/stt \
+curl -X POST https://metrics.openvoiceos.pt/stt \
   -H "User-Agent: ovos-metrics" \
   -F transcript="turn on the lights" \
   -F lang="en-us" \
@@ -93,7 +93,7 @@ Returns `PaginatedResponse[IntentRecord]`.
 | `limit` | int | 50 | Max 500 |
 
 ```bash
-curl "https://metrics.tigregotico.pt/intents?lang=en-us&page=1&limit=20"
+curl "https://metrics.openvoiceos.pt/intents?lang=en-us&page=1&limit=20"
 ```
 
 ### GET `/wake_words`
@@ -111,7 +111,7 @@ audio endpoint below to fetch a specific recording).
 | `limit` | int | 50 | Max 500 |
 
 ```bash
-curl "https://metrics.tigregotico.pt/wake_words?name=hey+mycroft&limit=10"
+curl "https://metrics.openvoiceos.pt/wake_words?name=hey+mycroft&limit=10"
 ```
 
 ### GET `/utterances`
@@ -127,7 +127,7 @@ Returns `PaginatedResponse[UtteranceRecord]` (audio bytes excluded).
 | `limit` | int | 50 | Max 500 |
 
 ```bash
-curl "https://metrics.tigregotico.pt/utterances?lang=pt-pt"
+curl "https://metrics.openvoiceos.pt/utterances?lang=pt-pt"
 ```
 
 ---
@@ -140,7 +140,7 @@ curl "https://metrics.tigregotico.pt/utterances?lang=pt-pt"
 | GET | `/utterances/{id}/audio` | `audio/wav` stream; `404` if no record with that id exists |
 
 ```bash
-curl -o sample.wav "https://metrics.tigregotico.pt/wake_words/42/audio"
+curl -o sample.wav "https://metrics.openvoiceos.pt/wake_words/42/audio"
 ```
 
 ---
@@ -159,8 +159,8 @@ rows per request; page through by narrowing the filters (e.g. by
 | `GET /utterances/export` | `lang`, `model`, `plugin` |
 
 ```bash
-curl -o intents.csv "https://metrics.tigregotico.pt/intents/export?format=csv&lang=en-us"
-curl -o wake_words.json "https://metrics.tigregotico.pt/wake_words/export?format=json"
+curl -o intents.csv "https://metrics.openvoiceos.pt/intents/export?format=csv&lang=en-us"
+curl -o wake_words.json "https://metrics.openvoiceos.pt/wake_words/export?format=json"
 ```
 
 Invalid `format` values return `400`.
