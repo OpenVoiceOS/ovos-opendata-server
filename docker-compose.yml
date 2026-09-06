@@ -12,7 +12,7 @@ services:
       - ovos-opendata-db
 
   ovos-opendata-db:
-    image: postgres:16
+    image: postgres:18
     container_name: ovos-opendata-db
     restart: unless-stopped
     env_file: .env
